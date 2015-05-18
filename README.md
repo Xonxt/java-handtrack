@@ -1,1 +1,2 @@
-# java-handtrack  initgit add README.mdgit commit -m "first commit"git remote add origin https://github.com/Xonxt/java-handtrack.gitgit push -u origin master
+The hand tracking and gesture recognition project converted to java.
+See https://github.com/Xonxt/htw-forschungsproject for more details.
