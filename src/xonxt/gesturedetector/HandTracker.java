@@ -1,5 +1,6 @@
 package xonxt.gesturedetector;
 
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +10,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
@@ -130,7 +133,50 @@ public class HandTracker {
 		// добавляем новую точку к линии трека
 		newHand.addTrackPoint(trackBox.center);
 		
+		// извлекаем контур
+		extractContour(newHand);
+		
 		return newHand;
+	}
+	
+	/**
+	 * Извлекает контур руки
+	 * @param hand Рука
+	 */
+	private void extractContour(Hand hand) {
+		
+		Rect roi = hand.getBoundingBox();
+		roi.x -= (roi.height * 0.25);
+		roi.y -= (roi.width * 0.2);
+		roi.width += (roi.width * 0.4);
+		roi.height += (roi.height * 0.5);
+		
+		if (roi.x < 0) 
+			roi.x = 0;
+		
+		if (roi.y < 0)
+			roi.y = 0;
+		
+		if (roi.br().x >= bwMask.cols())
+			roi.width = (bwMask.cols() - roi.x - 1);
+		
+		if (roi.br().y >= bwMask.rows())
+			roi.height-= (bwMask.rows() - roi.y - 1);		
+		
+		Mat roiCrop = new Mat(bwMask, roi);
+		
+		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+		Imgproc.findContours(roiCrop, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE, roi.tl());
+		
+		if(!contours.isEmpty()) {
+			for (int i = 0; i < contours.size(); i++) {
+				MatOfPoint2f data = new MatOfPoint2f();
+				contours.get(i).convertTo(data, CvType.CV_32FC2);
+				if (Imgproc.pointPolygonTest(data, hand.getCenter(), false) >= 0) {
+					hand.setContour(contours.get(i));
+				}
+			}
+		}
 	}
 	
 	/**

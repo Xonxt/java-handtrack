@@ -13,6 +13,7 @@ public class FrameProcessor {
 	private HandDetector handDetector;
 	private HandTracker handTracker;
 	private CascadeClassifier faceDetector;
+	private ContourAnalyzer contourAnalyzer;
 	
 	private Mat image;
 	
@@ -32,6 +33,8 @@ public class FrameProcessor {
 		if (faceDetector.empty()) {
 			return false;
 		}
+		
+		contourAnalyzer = new ContourAnalyzer();
 		
 		return true;
 	}
@@ -58,7 +61,7 @@ public class FrameProcessor {
 				Rect oldHand = hands.get(j).getBoundingBox();
 				Rect newHand = newHands.get(i).getBoundingBox();
 				
-				if (overlapRatio(oldHand, oldHand, 0.75)) {
+				if (overlapRatio(oldHand, newHand, 0.75)) {
 					// эта рука уже была найдена, выйти из цикла
 					handAlreadyFound = true;
 					break;
@@ -73,6 +76,11 @@ public class FrameProcessor {
 		
 		// убрать все ложные срабатывания и лишние руки
 		removeBadHands();
+		
+		// проводим контурный анализ
+		for (Hand hand : hands) {
+			contourAnalyzer.extractFingers(hand);
+		}
 	}
 	
 	public ArrayList<Hand> getHands() {

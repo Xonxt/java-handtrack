@@ -1,10 +1,12 @@
 package xonxt.gesturedetector;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.RotatedRect;
 import org.opencv.core.Point;
@@ -22,6 +24,8 @@ public class Hand {
 	private boolean isTracked;
 	private Rect trackWindow;
 	private Mat hist;
+	private MatOfPoint contour;
+	private ArrayList<Point> fingers;
 	
 	public Point getCenter() {
 		return trackedBox.center;
@@ -63,6 +67,27 @@ public class Hand {
 		hist = _hist;
 	}
 	
+	public MatOfPoint getContour() {
+		return contour;
+	}
+	
+	public void setContour(MatOfPoint points) {
+		contour = points;
+	}
+	
+	public ArrayList<Point> getFingers() {
+		return fingers;
+	}
+	
+	public void setFingers(ArrayList<Point> _fingers) {
+		fingers = new ArrayList<Point>();
+		fingers.clear();
+		
+		for (Point pt : _fingers) {
+			fingers.add(pt);
+		}
+	}
+	
 	public Hand() {
 		// TODO Auto-generated constructor stub
 		isTracked = false;
@@ -82,6 +107,13 @@ public class Hand {
 			trackLine.add(pt);
 		}		
 		
+		contour = obj.getContour();
+		
+		fingers = new ArrayList<Point>();
+		for (Point pt : obj.getFingers()) {
+			fingers.add(pt);
+		}
+		
 		hist = obj.getHist();
 	}
 	
@@ -97,6 +129,8 @@ public class Hand {
 		isTracked = false;
 		
 		trackLine = new ArrayList<Point>();
+		contour = new MatOfPoint();
+		fingers = new ArrayList<Point>();
 		
 		trackWindow = detectedBox.clone();
 	}

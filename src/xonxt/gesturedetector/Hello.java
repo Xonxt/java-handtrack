@@ -58,9 +58,13 @@ public class Hello {
 					// забираем все руки
 					hands = frameProcessor.getHands();
 					// отображаем руки на кадре					
-					frame = Visualizer.drawHands(frame, hands);
+					//frame = Visualizer.drawHands(frame, hands);
 					// отображает линии трека
-					frame = Visualizer.drawTrackLines(frame, hands);
+					//frame = Visualizer.drawTrackLines(frame, hands);
+					// показываем контур
+					frame = Visualizer.drawContours(frame, hands);
+					// показываем пальчики
+					frame = Visualizer.drawFingertips(frame, hands);
 					// показываем кадр
 					window.imshow(frame);
 				}
